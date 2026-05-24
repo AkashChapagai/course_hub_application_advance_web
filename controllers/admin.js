@@ -4,6 +4,7 @@ import { requireAdmin } from "../tools/authorisation.js";
 
 import { adminDashboardView } from "../views/admin-dashboard.js";
 import { adminProgrammesView } from "../views/admin-programmes.js";
+import { adminProgrammeFormView } from "../views/admin-programme-form.js";
 
 import { notFoundView } from "../views/not-found.js";
 
