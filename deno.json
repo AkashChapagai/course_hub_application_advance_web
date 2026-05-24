@@ -1,0 +1,14 @@
+{
+  "tasks": {
+    "serve": "deno run --watch --allow-all main.js",
+    "db:init": "deno run --allow-all tasks/db-init.js",
+    "db:seed": "deno run --allow-all tasks/db-seed.js"
+  },
+  "imports": {
+    "@std/http": "jsr:@std/http",
+    "@std/http/file-server": "jsr:@std/http/file-server",
+    "@std/http/cookie": "jsr:@std/http/cookie",
+    "@std/html": "jsr:@std/html",
+    "@db/sqlite": "jsr:@db/sqlite"
+  }
+}
