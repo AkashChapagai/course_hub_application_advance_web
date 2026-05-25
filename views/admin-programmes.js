@@ -1,89 +1,112 @@
 import { escape } from "@std/html";
 
-function statusBadge(programme) {
-  return programme.published
-    ? `<span class="status published">Published</span>`
-    : `<span class="status draft">Draft</span>`;
+function safe(value = "") {
+  return escape(String(value ?? ""));
 }
 
-function publishButton(programme) {
+function statusBadge(programme) {
+  return programme.published
+    ? `<span class="status-badge published">Published</span>`
+    : `<span class="status-badge draft">Draft</span>`;
+}
+
+function publishAction(programme) {
   if (programme.published) {
     return `
-      <form method="POST" action="/admin/programmes/${programme.id}/unpublish">
+      <form method="POST" action="/admin/programmes/${safe(programme.id)}/unpublish">
         <button class="button secondary" type="submit">Unpublish</button>
       </form>
     `;
   }
 
   return `
-    <form method="POST" action="/admin/programmes/${programme.id}/publish">
-      <button class="button" type="submit">Publish</button>
+    <form method="POST" action="/admin/programmes/${safe(programme.id)}/publish">
+      <button class="button secondary" type="submit">Publish</button>
     </form>
   `;
 }
 
-function adminProgrammeRow(programme) {
+function programmeRow(programme) {
   return `
     <tr>
       <td>
-        <strong>${escape(programme.title)}</strong>
-        <p class="table-note">${escape(programme.description)}</p>
+        <strong>${safe(programme.title)}</strong>
+        <p>${safe(programme.description)}</p>
       </td>
-      <td>${escape(programme.level)}</td>
-      <td>${escape(programme.programmeLeader || "To be confirmed")}</td>
+
+      <td>${safe(programme.level)}</td>
+
+      <td>${safe(programme.programmeLeader || "To be confirmed")}</td>
+
       <td>${statusBadge(programme)}</td>
-      <td class="table-actions">
-  <a class="button secondary" href="/admin/programmes/${programme.id}/edit">Edit</a>
 
-  <a class="button secondary" href="/admin/programmes/${programme.id}/modules">Modules</a>
+      <td>
+        <div class="action-group">
+          <a class="button secondary" href="/admin/programmes/${safe(programme.id)}/edit">
+            Edit
+          </a>
 
-  ${publishButton(programme)}
+          <a class="button secondary" href="/admin/programmes/${safe(programme.id)}/modules">
+            Modules
+          </a>
 
-  <form
-    method="POST"
-    action="/admin/programmes/${programme.id}/delete"
-    onsubmit="return confirm('Delete this programme? This cannot be undone.')"
-  >
-    <button class="button danger" type="submit">Delete</button>
-  </form>
-</td>
-      <
+          ${publishAction(programme)}
+
+          <form
+            method="POST"
+            action="/admin/programmes/${safe(programme.id)}/delete"
+            onsubmit="return confirm('Are you sure you want to delete this programme?');"
+          >
+            <button class="button danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </td>
     </tr>
   `;
 }
 
-export function adminProgrammesView({ programmes }) {
-  const rows = programmes.length
-    ? programmes.map(adminProgrammeRow).join("")
-    : `<tr><td colspan="5">No programmes found.</td></tr>`;
+export function adminProgrammesView({ programmes = [] }) {
+  const programmeRows = programmes.length
+    ? programmes.map(programmeRow).join("")
+    : `
+      <tr>
+        <td colspan="5">
+          <p class="empty-message">No programmes have been created yet.</p>
+        </td>
+      </tr>
+    `;
 
   return `
     <section class="page-heading">
       <p class="eyebrow">Admin area</p>
       <h2>Manage programmes</h2>
       <p>
-        Admin users can view both published public programmes and unpublished draft programmes.
+        Admin users can create, edit, publish and unpublish programmes.
+        Published programmes appear on the student-facing website.
       </p>
     </section>
 
-    <section class="page-panel">
+    <section class="admin-panel">
       <div class="admin-actions">
-        <a class="button" href="/admin">Back to dashboard</a>
+        <a class="button" href="/admin/programmes/new">Create programme</a>
+        <a class="button secondary" href="/admin">Back to dashboard</a>
       </div>
 
       <div class="table-wrapper">
         <table>
+          <caption>Programme management table</caption>
           <thead>
             <tr>
-              <th>Programme</th>
-              <th>Level</th>
-              <th>Programme leader</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th scope="col">Programme</th>
+              <th scope="col">Level</th>
+              <th scope="col">Programme leader</th>
+              <th scope="col">Status</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
+
           <tbody>
-            ${rows}
+            ${programmeRows}
           </tbody>
         </table>
       </div>
