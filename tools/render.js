@@ -1,3 +1,9 @@
+import { escape } from "@std/html";
+
+function safe(value = "") {
+  return escape(String(value ?? ""));
+}
+
 export function render(viewFunction, viewData = {}, ctx = {}) {
   const content = viewFunction(viewData);
   const session = ctx.session;
@@ -6,7 +12,7 @@ export function render(viewFunction, viewData = {}, ctx = {}) {
     ? `
       <a href="/admin">Admin</a>
       <form class="nav-form" method="POST" action="/logout">
-        <button type="submit">Logout ${session.username}</button>
+        <button type="submit">Logout ${safe(session.username)}</button>
       </form>
     `
     : `<a href="/login">Admin Login</a>`;
@@ -18,7 +24,6 @@ export function render(viewFunction, viewData = {}, ctx = {}) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Student Course Hub</title>
   <link rel="stylesheet" href="/style.css">
-  <script type="module" src="/app.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -43,16 +48,18 @@ export function render(viewFunction, viewData = {}, ctx = {}) {
     <div class="container">
       ${
         session
-          ? `<p>Signed in as ${session.username} (${session.role})</p>`
+          ? `<p>Signed in as ${safe(session.username)} (${safe(session.role)})</p>`
           : `<p>&copy; 2026 Student Course Hub. Built with Deno, HTML, CSS and JavaScript.</p>`
       }
     </div>
   </footer>
+
+  <script type="module" src="/app.js?v=3"></script>
 </body>
 </html>`, {
     status: ctx.status || 200,
     headers: {
-      "content-type": "text/html; charset=utf-8"
-    }
+      "content-type": "text/html; charset=utf-8",
+    },
   });
 }

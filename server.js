@@ -1,21 +1,22 @@
 import { serveDir } from "@std/http/file-server";
 import { currentSession } from "./tools/auth.js";
 import { homeController } from "./controllers/home.js";
+import { apiProgrammesController } from "./controllers/api-programmes.js";
 
 import {
   programmesController,
-  programmeDetailController
+  programmeDetailController,
 } from "./controllers/programmes.js";
 
 import {
   createInterestController,
-  interestSuccessController
+  interestSuccessController,
 } from "./controllers/interests.js";
 
 import {
   loginFormController,
   loginController,
-  logoutController
+  logoutController,
 } from "./controllers/sessions.js";
 
 import {
@@ -27,7 +28,7 @@ import {
   updateProgrammeController,
   deleteProgrammeController,
   publishProgrammeController,
-  unpublishProgrammeController
+  unpublishProgrammeController,
 } from "./controllers/admin.js";
 
 import {
@@ -36,88 +37,90 @@ import {
   createModuleController,
   editModuleFormController,
   updateModuleController,
-  deleteModuleController
+  deleteModuleController,
 } from "./controllers/admin-modules.js";
 
 import {
   programmeModulesController,
   attachProgrammeModuleController,
-  removeProgrammeModuleController
+  removeProgrammeModuleController,
 } from "./controllers/admin-programme-modules.js";
+
 import {
   adminInterestsController,
   deleteInterestController,
-  programmeInterestsCsvController
+  programmeInterestsCsvController,
 } from "./controllers/admin-interests.js";
 
 import { notFoundController } from "./controllers/not-found.js";
 
 const programmeDetailPattern = new URLPattern({
-  pathname: "/programmes/:programmeId"
+  pathname: "/programmes/:programmeId",
 });
 
 const createInterestPattern = new URLPattern({
-  pathname: "/programmes/:programmeId/interests"
+  pathname: "/programmes/:programmeId/interests",
 });
 
 const interestSuccessPattern = new URLPattern({
-  pathname: "/interests/:interestId/success"
+  pathname: "/interests/:interestId/success",
 });
 
 const editProgrammePattern = new URLPattern({
-  pathname: "/admin/programmes/:programmeId/edit"
+  pathname: "/admin/programmes/:programmeId/edit",
 });
 
 const updateProgrammePattern = new URLPattern({
-  pathname: "/admin/programmes/:programmeId/update"
+  pathname: "/admin/programmes/:programmeId/update",
 });
 
 const deleteProgrammePattern = new URLPattern({
-  pathname: "/admin/programmes/:programmeId/delete"
+  pathname: "/admin/programmes/:programmeId/delete",
 });
 
 const publishProgrammePattern = new URLPattern({
-  pathname: "/admin/programmes/:programmeId/publish"
+  pathname: "/admin/programmes/:programmeId/publish",
 });
 
 const unpublishProgrammePattern = new URLPattern({
-  pathname: "/admin/programmes/:programmeId/unpublish"
+  pathname: "/admin/programmes/:programmeId/unpublish",
 });
 
 const programmeModulesPattern = new URLPattern({
-  pathname: "/admin/programmes/:programmeId/modules"
+  pathname: "/admin/programmes/:programmeId/modules",
 });
 
 const removeProgrammeModulePattern = new URLPattern({
-  pathname: "/admin/programmes/:programmeId/modules/:moduleId/remove"
+  pathname: "/admin/programmes/:programmeId/modules/:moduleId/remove",
 });
 
 const editModulePattern = new URLPattern({
-  pathname: "/admin/modules/:moduleId/edit"
+  pathname: "/admin/modules/:moduleId/edit",
 });
 
 const updateModulePattern = new URLPattern({
-  pathname: "/admin/modules/:moduleId/update"
+  pathname: "/admin/modules/:moduleId/update",
 });
 
 const deleteModulePattern = new URLPattern({
-  pathname: "/admin/modules/:moduleId/delete"
+  pathname: "/admin/modules/:moduleId/delete",
 });
 
 const deleteInterestPattern = new URLPattern({
-  pathname: "/admin/interests/:interestId/delete"
+  pathname: "/admin/interests/:interestId/delete",
 });
 
 const programmeInterestsCsvPattern = new URLPattern({
-  pathname: "/admin/programmes/:programmeId/interests.csv"
+  pathname: "/admin/programmes/:programmeId/interests.csv",
 });
 
-export async function handler(request) {
+export  function handler(request) {
   const url = new URL(request.url);
   const pathname = url.pathname;
 
   console.log(`${request.method} ${pathname}`);
 
+  // Static files
   if (
     pathname.endsWith(".css") ||
     pathname.endsWith(".js") ||
@@ -132,6 +135,11 @@ export async function handler(request) {
 
   const session = currentSession(request);
   const ctx = { request, session };
+
+  // JSON API routes
+  if (pathname === "/api/programmes" && request.method === "GET") {
+    return apiProgrammesController(ctx);
+  }
 
   // Public routes
   if (pathname === "/" && request.method === "GET") {
@@ -256,22 +264,21 @@ export async function handler(request) {
     const params = deleteModulePattern.exec(url).pathname.groups;
     return deleteModuleController({ ...ctx, params });
   }
+
   // Admin interests / mailing lists
-if (pathname === "/admin/interests" && request.method === "GET") {
-  return adminInterestsController(ctx);
-}
+  if (pathname === "/admin/interests" && request.method === "GET") {
+    return adminInterestsController(ctx);
+  }
 
-if (deleteInterestPattern.test(url) && request.method === "POST") {
-  const params = deleteInterestPattern.exec(url).pathname.groups;
-  return deleteInterestController({ ...ctx, params });
-}
+  if (deleteInterestPattern.test(url) && request.method === "POST") {
+    const params = deleteInterestPattern.exec(url).pathname.groups;
+    return deleteInterestController({ ...ctx, params });
+  }
 
-if (programmeInterestsCsvPattern.test(url) && request.method === "GET") {
-  const params = programmeInterestsCsvPattern.exec(url).pathname.groups;
-  return programmeInterestsCsvController({ ...ctx, params });
-}
+  if (programmeInterestsCsvPattern.test(url) && request.method === "GET") {
+    const params = programmeInterestsCsvPattern.exec(url).pathname.groups;
+    return programmeInterestsCsvController({ ...ctx, params });
+  }
 
-return notFoundController(ctx);
-
-
+  return notFoundController(ctx);
 }

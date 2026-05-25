@@ -84,7 +84,7 @@ export function createProgramme({
   level,
   description,
   programmeLeaderId,
-  published
+  published,
 }) {
   return db.prepare(`
     INSERT INTO programmes (
@@ -101,7 +101,7 @@ export function createProgramme({
     level,
     description,
     programmeLeaderId || null,
-    published ? 1 : 0
+    published ? 1 : 0,
   );
 }
 
@@ -110,7 +110,7 @@ export function updateProgramme(id, {
   level,
   description,
   programmeLeaderId,
-  published
+  published,
 }) {
   db.prepare(`
     UPDATE programmes
@@ -128,7 +128,7 @@ export function updateProgramme(id, {
     description,
     programmeLeaderId || null,
     published ? 1 : 0,
-    id
+    id,
   );
 }
 
@@ -142,8 +142,9 @@ export function deleteProgramme(id) {
 export function publishProgramme(id) {
   db.prepare(`
     UPDATE programmes
-    SET published = 1,
-        updatedAt = CURRENT_TIMESTAMP
+    SET
+      published = 1,
+      updatedAt = CURRENT_TIMESTAMP
     WHERE id = ?
   `).run(id);
 }
@@ -151,8 +152,9 @@ export function publishProgramme(id) {
 export function unpublishProgramme(id) {
   db.prepare(`
     UPDATE programmes
-    SET published = 0,
-        updatedAt = CURRENT_TIMESTAMP
+    SET
+      published = 0,
+      updatedAt = CURRENT_TIMESTAMP
     WHERE id = ?
   `).run(id);
 }
