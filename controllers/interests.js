@@ -1,19 +1,24 @@
 import { render } from "../tools/render.js";
 import { redirect } from "../tools/redirect.js";
+
 import {
   getPublishedProgrammeById,
-  getModulesForProgramme
+  getModulesForProgramme,
 } from "../models/programme.js";
+
 import {
   createInterest,
-  getInterestById
+  getInterestById,
+  getInterestForProgrammeByEmail,
 } from "../models/interest.js";
+
 import { programmeDetailView } from "../views/programme-detail.js";
 import { interestSuccessView } from "../views/interest-success.js";
 import { notFoundView } from "../views/not-found.js";
+
 import {
   validateSchema,
-  interestSchema
+  interestSchema,
 } from "../tools/validation.js";
 
 function groupModulesByYear(modules) {
@@ -29,6 +34,24 @@ function groupModulesByYear(modules) {
   }, {});
 }
 
+function renderProgrammeDetailWithErrors(ctx, programme, errors, status = 400) {
+  const modules = getModulesForProgramme(programme.id);
+  const modulesByYear = groupModulesByYear(modules);
+
+  return render(
+    programmeDetailView,
+    {
+      programme,
+      modulesByYear,
+      errors,
+    },
+    {
+      ...ctx,
+      status,
+    },
+  );
+}
+
 export async function createInterestController(ctx) {
   const { request, params } = ctx;
   const { programmeId } = params;
@@ -40,23 +63,44 @@ export async function createInterestController(ctx) {
   }
 
   const formData = await request.formData();
-  const { isValid, errors, validated } = validateSchema(formData, interestSchema);
+
+  const {
+    isValid,
+    errors,
+    validated,
+  } = validateSchema(formData, interestSchema);
 
   if (!isValid) {
-    const modules = getModulesForProgramme(programmeId);
-    const modulesByYear = groupModulesByYear(modules);
+    return renderProgrammeDetailWithErrors(ctx, programme, errors, 400);
+  }
 
-    return render(
-      programmeDetailView,
-      { programme, modulesByYear, errors },
-      { ...ctx, status: 400 }
-    );
+  const duplicateInterest = getInterestForProgrammeByEmail({
+    programmeId,
+    studentEmail: validated.studentEmail,
+  });
+
+  if (duplicateInterest) {
+    const duplicateErrors = {
+      ...errors,
+      studentName: {
+        ...errors.studentName,
+        value: validated.studentName,
+      },
+      studentEmail: {
+        ...errors.studentEmail,
+        value: validated.studentEmail,
+        message: "This email address has already registered interest in this programme.",
+        error: true,
+      },
+    };
+
+    return renderProgrammeDetailWithErrors(ctx, programme, duplicateErrors, 409);
   }
 
   const interest = createInterest({
     programmeId,
     studentName: validated.studentName,
-    studentEmail: validated.studentEmail
+    studentEmail: validated.studentEmail,
   });
 
   return redirect(`/interests/${interest.id}/success`);
@@ -64,6 +108,7 @@ export async function createInterestController(ctx) {
 
 export function interestSuccessController(ctx) {
   const { interestId } = ctx.params;
+
   const interest = getInterestById(interestId);
 
   if (!interest) {

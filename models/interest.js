@@ -1,11 +1,38 @@
 import { db } from "../tools/db.js";
 
+function normaliseEmail(email) {
+  return String(email ?? "").trim().toLowerCase();
+}
+
+export function getInterestForProgrammeByEmail({ programmeId, studentEmail }) {
+  return db.prepare(`
+    SELECT
+      id,
+      programmeId,
+      studentName,
+      studentEmail,
+      createdAt
+    FROM interests
+    WHERE programmeId = ?
+      AND LOWER(TRIM(studentEmail)) = LOWER(TRIM(?))
+    LIMIT 1
+  `).get(programmeId, studentEmail);
+}
+
 export function createInterest({ programmeId, studentName, studentEmail }) {
   return db.prepare(`
-    INSERT INTO interests (programmeId, studentName, studentEmail)
+    INSERT INTO interests (
+      programmeId,
+      studentName,
+      studentEmail
+    )
     VALUES (?, ?, ?)
     RETURNING id
-  `).get(programmeId, studentName, studentEmail);
+  `).get(
+    programmeId,
+    studentName,
+    normaliseEmail(studentEmail),
+  );
 }
 
 export function getInterestById(id) {
@@ -22,6 +49,7 @@ export function getInterestById(id) {
     WHERE interests.id = ?
   `).get(id);
 }
+
 export function getAllInterestsForAdmin() {
   return db.prepare(`
     SELECT
