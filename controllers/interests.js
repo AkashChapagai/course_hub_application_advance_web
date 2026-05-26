@@ -9,11 +9,14 @@ import {
 import {
   createInterest,
   getInterestById,
+  getInterestByWithdrawToken,
   getInterestForProgrammeByEmail,
+  withdrawInterestByToken,
 } from "../models/interest.js";
 
 import { programmeDetailView } from "../views/programme-detail.js";
 import { interestSuccessView } from "../views/interest-success.js";
+import { interestWithdrawView } from "../views/interest-withdraw.js";
 import { notFoundView } from "../views/not-found.js";
 
 import {
@@ -116,4 +119,44 @@ export function interestSuccessController(ctx) {
   }
 
   return render(interestSuccessView, { interest }, ctx);
+}
+
+export function withdrawInterestFormController(ctx) {
+  const { withdrawToken } = ctx.params;
+
+  const interest = getInterestByWithdrawToken(withdrawToken);
+
+  if (!interest) {
+    return render(notFoundView, {}, { ...ctx, status: 404 });
+  }
+
+  return render(
+    interestWithdrawView,
+    {
+      interest,
+      withdrawn: false,
+    },
+    ctx,
+  );
+}
+
+export function withdrawInterestController(ctx) {
+  const { withdrawToken } = ctx.params;
+
+  const interest = getInterestByWithdrawToken(withdrawToken);
+
+  if (!interest) {
+    return render(notFoundView, {}, { ...ctx, status: 404 });
+  }
+
+  withdrawInterestByToken(withdrawToken);
+
+  return render(
+    interestWithdrawView,
+    {
+      interest,
+      withdrawn: true,
+    },
+    ctx,
+  );
 }

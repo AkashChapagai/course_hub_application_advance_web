@@ -79,6 +79,7 @@ db.exec(`
     programmeId INTEGER NOT NULL,
     studentName TEXT NOT NULL,
     studentEmail TEXT NOT NULL,
+    withdrawToken TEXT NOT NULL UNIQUE,
     createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(programmeId, studentEmail),
     FOREIGN KEY (programmeId) REFERENCES programmes(id) ON DELETE CASCADE

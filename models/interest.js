@@ -4,6 +4,10 @@ function normaliseEmail(email) {
   return String(email ?? "").trim().toLowerCase();
 }
 
+function createWithdrawToken() {
+  return crypto.randomUUID();
+}
+
 export function getInterestForProgrammeByEmail({ programmeId, studentEmail }) {
   return db.prepare(`
     SELECT
@@ -11,6 +15,7 @@ export function getInterestForProgrammeByEmail({ programmeId, studentEmail }) {
       programmeId,
       studentName,
       studentEmail,
+      withdrawToken,
       createdAt
     FROM interests
     WHERE programmeId = ?
@@ -24,14 +29,16 @@ export function createInterest({ programmeId, studentName, studentEmail }) {
     INSERT INTO interests (
       programmeId,
       studentName,
-      studentEmail
+      studentEmail,
+      withdrawToken
     )
-    VALUES (?, ?, ?)
-    RETURNING id
+    VALUES (?, ?, ?, ?)
+    RETURNING id, withdrawToken
   `).get(
     programmeId,
     studentName,
     normaliseEmail(studentEmail),
+    createWithdrawToken(),
   );
 }
 
@@ -41,6 +48,7 @@ export function getInterestById(id) {
       interests.id,
       interests.studentName,
       interests.studentEmail,
+      interests.withdrawToken,
       interests.createdAt,
       programmes.title AS programmeTitle,
       programmes.level AS programmeLevel
@@ -48,6 +56,30 @@ export function getInterestById(id) {
     INNER JOIN programmes ON interests.programmeId = programmes.id
     WHERE interests.id = ?
   `).get(id);
+}
+
+export function getInterestByWithdrawToken(withdrawToken) {
+  return db.prepare(`
+    SELECT
+      interests.id,
+      interests.programmeId,
+      interests.studentName,
+      interests.studentEmail,
+      interests.withdrawToken,
+      interests.createdAt,
+      programmes.title AS programmeTitle,
+      programmes.level AS programmeLevel
+    FROM interests
+    INNER JOIN programmes ON interests.programmeId = programmes.id
+    WHERE interests.withdrawToken = ?
+  `).get(withdrawToken);
+}
+
+export function withdrawInterestByToken(withdrawToken) {
+  db.prepare(`
+    DELETE FROM interests
+    WHERE withdrawToken = ?
+  `).run(withdrawToken);
 }
 
 export function getAllInterestsForAdmin() {

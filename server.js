@@ -11,6 +11,8 @@ import {
 import {
   createInterestController,
   interestSuccessController,
+  withdrawInterestController,
+  withdrawInterestFormController,
 } from "./controllers/interests.js";
 
 import {
@@ -66,6 +68,10 @@ const interestSuccessPattern = new URLPattern({
   pathname: "/interests/:interestId/success",
 });
 
+const withdrawInterestPattern = new URLPattern({
+  pathname: "/interests/:withdrawToken/withdraw",
+});
+
 const editProgrammePattern = new URLPattern({
   pathname: "/admin/programmes/:programmeId/edit",
 });
@@ -114,7 +120,7 @@ const programmeInterestsCsvPattern = new URLPattern({
   pathname: "/admin/programmes/:programmeId/interests.csv",
 });
 
-export  function handler(request) {
+export function handler(request) {
   const url = new URL(request.url);
   const pathname = url.pathname;
 
@@ -163,6 +169,16 @@ export  function handler(request) {
   if (interestSuccessPattern.test(url) && request.method === "GET") {
     const params = interestSuccessPattern.exec(url).pathname.groups;
     return interestSuccessController({ ...ctx, params });
+  }
+
+  if (withdrawInterestPattern.test(url) && request.method === "GET") {
+    const params = withdrawInterestPattern.exec(url).pathname.groups;
+    return withdrawInterestFormController({ ...ctx, params });
+  }
+
+  if (withdrawInterestPattern.test(url) && request.method === "POST") {
+    const params = withdrawInterestPattern.exec(url).pathname.groups;
+    return withdrawInterestController({ ...ctx, params });
   }
 
   // Authentication routes

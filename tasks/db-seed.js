@@ -10,11 +10,41 @@ await createUser({
 db.exec(`
   INSERT INTO staff (id, name, title, email, bio)
   VALUES
-    (1, 'Dr Sarah Mitchell', 'Programme Leader', 'sarah.mitchell@example.ac.uk', 'Specialises in software engineering, web development and student employability.'),
-    (2, 'Dr James Carter', 'Module Leader', 'james.carter@example.ac.uk', 'Teaches programming, databases and full-stack development.'),
-    (3, 'Dr Priya Shah', 'Module Leader', 'priya.shah@example.ac.uk', 'Focuses on cyber security, secure systems and digital forensics.'),
-    (4, 'Dr Emily Brown', 'Module Leader', 'emily.brown@example.ac.uk', 'Researches artificial intelligence, data science and machine learning.'),
-    (5, 'Dr Michael Green', 'Programme Leader', 'michael.green@example.ac.uk', 'Leads postgraduate computing programmes and industry projects.');
+    (
+      1,
+      'Dr Sarah Mitchell',
+      'Programme Leader',
+      'sarah.mitchell@example.ac.uk',
+      'Specialises in software engineering, web development and student employability.'
+    ),
+    (
+      2,
+      'Dr James Carter',
+      'Module Leader',
+      'james.carter@example.ac.uk',
+      'Teaches programming, databases and full-stack development.'
+    ),
+    (
+      3,
+      'Dr Priya Shah',
+      'Module Leader',
+      'priya.shah@example.ac.uk',
+      'Focuses on cyber security, secure systems and digital forensics.'
+    ),
+    (
+      4,
+      'Dr Emily Brown',
+      'Module Leader',
+      'emily.brown@example.ac.uk',
+      'Researches artificial intelligence, data science and machine learning.'
+    ),
+    (
+      5,
+      'Dr Michael Green',
+      'Programme Leader',
+      'michael.green@example.ac.uk',
+      'Leads postgraduate computing programmes and industry projects.'
+    );
 
   INSERT INTO programmes (
     id,
@@ -158,28 +188,52 @@ db.exec(`
     (1, 3, 2),
     (1, 4, 2),
     (1, 10, 3),
+
     (2, 1, 1),
     (2, 2, 1),
     (2, 5, 2),
     (2, 6, 2),
     (2, 10, 3),
+
     (3, 1, 1),
     (3, 2, 1),
     (3, 7, 2),
     (3, 4, 2),
     (3, 10, 3),
+
     (4, 8, 1),
     (4, 9, 1),
     (4, 3, 1),
+
     (5, 8, 1),
     (5, 4, 1),
     (5, 9, 1);
 
-  INSERT INTO interests (programmeId, studentName, studentEmail)
+  INSERT INTO interests (
+    programmeId,
+    studentName,
+    studentEmail,
+    withdrawToken
+  )
   VALUES
-    (1, 'Alex Taylor', 'alex.taylor@example.com'),
-    (2, 'Jordan Smith', 'jordan.smith@example.com'),
-    (4, 'Casey Morgan', 'casey.morgan@example.com');
+    (
+      1,
+      'Alex Taylor',
+      'alex.taylor@example.com',
+      'seed-alex-taylor-withdraw-token'
+    ),
+    (
+      2,
+      'Jordan Smith',
+      'jordan.smith@example.com',
+      'seed-jordan-smith-withdraw-token'
+    ),
+    (
+      4,
+      'Casey Morgan',
+      'casey.morgan@example.com',
+      'seed-casey-morgan-withdraw-token'
+    );
 `);
 
 console.log("Database seeded successfully.");
