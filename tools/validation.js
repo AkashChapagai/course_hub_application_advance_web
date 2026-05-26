@@ -28,6 +28,28 @@ export function isEmail(name, value) {
   }
 }
 
+export function optionalUrl(name, value) {
+  const text = String(value || "").trim();
+
+  if (text === "") {
+    return;
+  }
+
+  if (text.startsWith("/")) {
+    return;
+  }
+
+  try {
+    const url = new URL(text);
+
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return `${name} must be a valid http or https image URL.`;
+    }
+  } catch {
+    return `${name} must be a valid image URL or local image path.`;
+  }
+}
+
 export function validateField(name, value, validators) {
   for (const validator of validators) {
     const error = validator(name, value);
@@ -66,8 +88,8 @@ export function validateSchema(formData, schema) {
       {
         value,
         message,
-        error: Boolean(message)
-      }
+        error: Boolean(message),
+      },
     ];
   });
 
@@ -76,74 +98,85 @@ export function validateSchema(formData, schema) {
   return {
     isValid,
     errors,
-    validated
+    validated,
   };
 }
 
 export const interestSchema = {
   studentName: {
     displayName: "Full name",
-    validators: [required, minLength(2), maxLength(80)]
+    validators: [required, minLength(2), maxLength(80)],
   },
   studentEmail: {
     displayName: "Email address",
-    validators: [required, maxLength(120), isEmail]
-  }
+    validators: [required, maxLength(120), isEmail],
+  },
 };
+
 export const loginSchema = {
   username: {
     displayName: "Username",
-    validators: [required, minLength(2), maxLength(50)]
+    validators: [required, minLength(2), maxLength(50)],
   },
   password: {
     displayName: "Password",
-    validators: [required, minLength(6), maxLength(100)]
-  }
+    validators: [required, minLength(6), maxLength(100)],
+  },
 };
+
 export const programmeSchema = {
   title: {
     displayName: "Programme title",
-    validators: [required, minLength(3), maxLength(120)]
+    validators: [required, minLength(3), maxLength(120)],
   },
   level: {
     displayName: "Programme level",
-    validators: [required, oneOf(["Undergraduate", "Postgraduate"])]
+    validators: [required, oneOf(["Undergraduate", "Postgraduate"])],
   },
   description: {
     displayName: "Description",
-    validators: [required, minLength(20), maxLength(1000)]
+    validators: [required, minLength(20), maxLength(1000)],
+  },
+  imageUrl: {
+    displayName: "Programme image URL",
+    validators: [maxLength(500), optionalUrl],
   },
   programmeLeaderId: {
     displayName: "Programme leader",
-    validators: []
+    validators: [],
   },
   published: {
     displayName: "Published status",
-    validators: []
-  }
-  
+    validators: [],
+  },
 };
+
 export const moduleSchema = {
   title: {
     displayName: "Module title",
-    validators: [required, minLength(3), maxLength(120)]
+    validators: [required, minLength(3), maxLength(120)],
   },
   description: {
     displayName: "Module description",
-    validators: [required, minLength(10), maxLength(800)]
+    validators: [required, minLength(10), maxLength(800)],
+  },
+  imageUrl: {
+    displayName: "Module image URL",
+    validators: [maxLength(500), optionalUrl],
   },
   moduleLeaderId: {
     displayName: "Module leader",
-    validators: []
-  }
+    validators: [],
+  },
 };
+
 export const programmeModuleSchema = {
   moduleId: {
     displayName: "Module",
-    validators: [required]
+    validators: [required],
   },
   year: {
     displayName: "Year of study",
-    validators: [required, oneOf(["1", "2", "3", "4"])]
-  }
+    validators: [required, oneOf(["1", "2", "3", "4"])],
+  },
 };

@@ -7,6 +7,7 @@ export function getPublishedProgrammes() {
       programmes.title,
       programmes.level,
       programmes.description,
+      programmes.imageUrl,
       programmes.published,
       staff.name AS programmeLeader
     FROM programmes
@@ -23,6 +24,7 @@ export function getPublishedProgrammeById(id) {
       programmes.title,
       programmes.level,
       programmes.description,
+      programmes.imageUrl,
       programmes.published,
       staff.name AS programmeLeader,
       staff.email AS programmeLeaderEmail,
@@ -39,6 +41,7 @@ export function getModulesForProgramme(programmeId) {
       modules.id,
       modules.title,
       modules.description,
+      modules.imageUrl,
       programme_modules.year,
       staff.name AS moduleLeader,
       staff.email AS moduleLeaderEmail
@@ -57,6 +60,7 @@ export function getAllProgrammesForAdmin() {
       programmes.title,
       programmes.level,
       programmes.description,
+      programmes.imageUrl,
       programmes.published,
       staff.name AS programmeLeader
     FROM programmes
@@ -72,6 +76,7 @@ export function getProgrammeForAdminById(id) {
       title,
       level,
       description,
+      imageUrl,
       published,
       programmeLeaderId
     FROM programmes
@@ -83,6 +88,7 @@ export function createProgramme({
   title,
   level,
   description,
+  imageUrl,
   programmeLeaderId,
   published,
 }) {
@@ -91,15 +97,17 @@ export function createProgramme({
       title,
       level,
       description,
+      imageUrl,
       programmeLeaderId,
       published
     )
-    VALUES (?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?)
     RETURNING id
   `).get(
     title,
     level,
     description,
+    imageUrl || null,
     programmeLeaderId || null,
     published ? 1 : 0,
   );
@@ -109,6 +117,7 @@ export function updateProgramme(id, {
   title,
   level,
   description,
+  imageUrl,
   programmeLeaderId,
   published,
 }) {
@@ -118,6 +127,7 @@ export function updateProgramme(id, {
       title = ?,
       level = ?,
       description = ?,
+      imageUrl = ?,
       programmeLeaderId = ?,
       published = ?,
       updatedAt = CURRENT_TIMESTAMP
@@ -126,6 +136,7 @@ export function updateProgramme(id, {
     title,
     level,
     description,
+    imageUrl || null,
     programmeLeaderId || null,
     published ? 1 : 0,
     id,
@@ -167,6 +178,7 @@ export function getProgrammeModulesForAdmin(programmeId) {
       programme_modules.year,
       modules.title,
       modules.description,
+      modules.imageUrl,
       staff.name AS moduleLeader
     FROM programme_modules
     INNER JOIN modules ON programme_modules.moduleId = modules.id

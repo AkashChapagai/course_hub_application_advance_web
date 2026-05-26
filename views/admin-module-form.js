@@ -1,17 +1,29 @@
 import { escape } from "@std/html";
 
+function safe(value = "") {
+  return escape(String(value ?? ""));
+}
+
 function fieldError(errors, fieldName) {
-  return errors?.[fieldName]?.message
-    ? `<span class="error-message">${escape(errors[fieldName].message)}</span>`
-    : "";
+  const message = errors?.[fieldName]?.message;
+
+  if (!message) {
+    return "";
+  }
+
+  return `
+    <p class="error-message" id="${fieldName}-error" role="alert">
+      ${safe(message)}
+    </p>
+  `;
 }
 
 function valueFor(module, errors, fieldName) {
   if (errors?.[fieldName]?.value !== undefined) {
-    return escape(errors[fieldName].value);
+    return safe(errors[fieldName].value);
   }
 
-  return escape(module?.[fieldName] ?? "");
+  return safe(module?.[fieldName] ?? "");
 }
 
 function selected(currentValue, optionValue) {
@@ -20,8 +32,8 @@ function selected(currentValue, optionValue) {
 
 function staffOptions(staff, currentLeaderId) {
   const options = staff.map((member) => `
-    <option value="${member.id}" ${selected(currentLeaderId, member.id)}>
-      ${escape(member.name)} — ${escape(member.title)}
+    <option value="${safe(member.id)}" ${selected(currentLeaderId, member.id)}>
+      ${safe(member.name)} — ${safe(member.title)}
     </option>
   `).join("");
 
@@ -35,59 +47,88 @@ export function adminModuleFormView({
   mode,
   module = {},
   staff = [],
-  errors = {}
+  errors = {},
 }) {
   const isEdit = mode === "edit";
 
   const action = isEdit
-    ? `/admin/modules/${module.id}/update`
+    ? `/admin/modules/${safe(module.id)}/update`
     : "/admin/modules";
 
   const title = isEdit ? "Edit module" : "Create module";
+  const buttonText = isEdit ? "Update module" : "Create module";
 
-  const currentLeaderId = errors?.moduleLeaderId?.value ?? module.moduleLeaderId ?? "";
+  const currentLeaderId = errors?.moduleLeaderId?.value ??
+    module.moduleLeaderId ??
+    "";
 
   return `
     <section class="page-heading">
       <p class="eyebrow">Admin area</p>
       <h2>${title}</h2>
       <p>
-        Use this form to manage module information and assign a module leader.
+        Use this form to manage module information, add an image link and assign
+        a module leader.
       </p>
     </section>
 
     <section class="page-panel">
       <form method="POST" action="${action}" class="form-grid admin-form" novalidate>
-        <div>
+        <div class="form-field">
           <label for="title">Module title</label>
           <input
             id="title"
             name="title"
             type="text"
             value="${valueFor(module, errors, "title")}"
+            aria-describedby="title-error"
+            required
           >
           ${fieldError(errors, "title")}
         </div>
 
-        <div>
+        <div class="form-field">
           <label for="moduleLeaderId">Module leader</label>
-          <select id="moduleLeaderId" name="moduleLeaderId">
+          <select
+            id="moduleLeaderId"
+            name="moduleLeaderId"
+            aria-describedby="moduleLeaderId-error"
+          >
             ${staffOptions(staff, currentLeaderId)}
           </select>
           ${fieldError(errors, "moduleLeaderId")}
         </div>
 
-        <div>
+        <div class="form-field">
+          <label for="imageUrl">Module image URL</label>
+          <input
+            id="imageUrl"
+            name="imageUrl"
+            type="url"
+            value="${valueFor(module, errors, "imageUrl")}"
+            placeholder="https://example.com/module-image.jpg"
+            aria-describedby="imageUrl-help imageUrl-error"
+          >
+          <p id="imageUrl-help" class="hint">
+            Optional. Paste a direct image link beginning with http:// or https://.
+          </p>
+          ${fieldError(errors, "imageUrl")}
+        </div>
+
+        <div class="form-field">
           <label for="description">Description</label>
-          <textarea id="description" name="description" rows="7">${valueFor(module, errors, "description")}</textarea>
+          <textarea
+            id="description"
+            name="description"
+            rows="7"
+            aria-describedby="description-error"
+            required
+          >${valueFor(module, errors, "description")}</textarea>
           ${fieldError(errors, "description")}
         </div>
 
         <div class="form-actions">
-          <button class="button" type="submit">
-            ${isEdit ? "Update module" : "Create module"}
-          </button>
-
+          <button class="button" type="submit">${buttonText}</button>
           <a class="button secondary" href="/admin/modules">Cancel</a>
         </div>
       </form>

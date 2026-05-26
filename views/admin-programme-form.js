@@ -53,12 +53,15 @@ export function adminProgrammeFormView({
   const title = isEdit ? "Edit programme" : "Create programme";
   const buttonText = isEdit ? "Update programme" : "Create programme";
   const action = isEdit
-    ? `/admin/programmes/${programme.id}/update`
+    ? `/admin/programmes/${safe(programme.id)}/update`
     : "/admin/programmes";
 
   const currentLevel = errors?.level?.value ?? programme.level ?? "Undergraduate";
-  const currentLeaderId = errors?.programmeLeaderId?.value ?? programme.programmeLeaderId ?? "";
-  const currentPublished = errors?.published?.value ?? String(programme.published ? 1 : 0);
+  const currentLeaderId = errors?.programmeLeaderId?.value ??
+    programme.programmeLeaderId ??
+    "";
+  const currentPublished = errors?.published?.value ??
+    String(programme.published ? 1 : 0);
 
   return `
     <section class="page-panel">
@@ -67,7 +70,8 @@ export function adminProgrammeFormView({
 
       <p>
         Use this form to manage programme information, assign a programme leader,
-        and control whether the programme is visible on the public website.
+        add an image link, and control whether the programme is visible on the
+        public website.
       </p>
 
       <form class="form-grid" method="POST" action="${action}" novalidate>
@@ -112,6 +116,22 @@ export function adminProgrammeFormView({
             ${staffOptions(staff, currentLeaderId)}
           </select>
           ${fieldError(errors, "programmeLeaderId")}
+        </div>
+
+        <div class="form-field">
+          <label for="imageUrl">Programme image URL</label>
+          <input
+            id="imageUrl"
+            name="imageUrl"
+            type="url"
+            value="${valueFor(programme, errors, "imageUrl")}"
+            placeholder="https://example.com/programme-image.jpg"
+            aria-describedby="imageUrl-help imageUrl-error"
+          >
+          <p id="imageUrl-help" class="hint">
+            Optional. Paste a direct image link beginning with http:// or https://.
+          </p>
+          ${fieldError(errors, "imageUrl")}
         </div>
 
         <div class="form-field">

@@ -831,3 +831,160 @@ tr:last-child td {
     grid-template-columns: 1fr;
   }
 }
+/* ---------------------------------------------------------
+   Image presentation styles
+   ---------------------------------------------------------
+   These styles support the optional imageUrl feature added
+   to programmes and modules. Images are stored as external
+   links in the database, then displayed on public-facing
+   programme cards, programme detail pages and module cards.
+   The rules below keep images responsive, consistent and
+   visually controlled across desktop and mobile layouts.
+--------------------------------------------------------- */
+
+/* Programme card images on the public /programmes page */
+.programme-card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 0.85rem;
+  border: 1px solid var(--border);
+  background: #e5e7eb;
+}
+
+/* Wrapper for programme card text content.
+   This keeps the text area separate from the image area. */
+.programme-card-content {
+  display: grid;
+  gap: 0.65rem;
+}
+
+/* Programme detail page image.
+   The image is shown at the top of a selected programme page. */
+.programme-detail-image {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+  background: #e5e7eb;
+}
+
+/* Programme detail text wrapper.
+   This keeps the image and written content neatly separated. */
+.programme-detail-content {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* Module images displayed inside each module card. */
+.module-card-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  margin-bottom: 0.85rem;
+  background: #e5e7eb;
+}
+
+/* Module text wrapper used after the module image. */
+.module-card-content {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Admin-side image preview.
+   This can be used later if image thumbnails are shown in
+   admin tables or edit screens. */
+.admin-image-preview {
+  width: 96px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: #e5e7eb;
+}
+
+/* Responsive image adjustments for small screens. */
+@media (max-width: 600px) {
+  .programme-card-image {
+    height: 150px;
+  }
+
+  .programme-detail-image {
+    max-height: 260px;
+  }
+
+  .module-card-image {
+    height: 135px;
+  }
+}
+
+/* ---------------------------------------------------------
+   Programme and module image styles
+   ---------------------------------------------------------
+   These styles control images added through the imageUrl field.
+   They keep external image links responsive, cropped neatly and
+   consistent across programme cards, programme detail pages and
+   module cards.
+--------------------------------------------------------- */
+
+.programme-card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 0.85rem;
+  border: 1px solid var(--border);
+  background: #e5e7eb;
+}
+
+.programme-card-content {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.programme-detail-image {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+  background: #e5e7eb;
+}
+
+.programme-detail-content {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.module-card-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  margin-bottom: 0.85rem;
+  background: #e5e7eb;
+}
+
+.module-card-content {
+  display: grid;
+  gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .programme-card-image {
+    height: 150px;
+  }
+
+  .programme-detail-image {
+    max-height: 260px;
+  }
+
+  .module-card-image {
+    height: 135px;
+  }
+}

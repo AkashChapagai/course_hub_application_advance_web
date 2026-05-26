@@ -12,20 +12,20 @@ import {
   getModuleForAdminById,
   createModule,
   updateModule,
-  deleteModule
+  deleteModule,
 } from "../models/module.js";
-
 
 import {
   validateSchema,
-  moduleSchema
+  moduleSchema,
 } from "../tools/validation.js";
 
 function formDataToModule(validated) {
   return {
     title: validated.title,
     description: validated.description,
-    moduleLeaderId: validated.moduleLeaderId || null
+    imageUrl: validated.imageUrl || null,
+    moduleLeaderId: validated.moduleLeaderId || null,
   };
 }
 
@@ -41,7 +41,7 @@ export function adminModulesController(ctx) {
   return render(
     adminModulesView,
     { modules },
-    ctx
+    ctx,
   );
 }
 
@@ -58,9 +58,9 @@ export function newModuleFormController(ctx) {
     adminModuleFormView,
     {
       mode: "new",
-      staff
+      staff,
     },
-    ctx
+    ctx,
   );
 }
 
@@ -72,7 +72,10 @@ export async function createModuleController(ctx) {
   }
 
   const formData = await ctx.request.formData();
-  const { isValid, errors, validated } = validateSchema(formData, moduleSchema);
+  const { isValid, errors, validated } = validateSchema(
+    formData,
+    moduleSchema,
+  );
   const staff = getAllStaff();
 
   if (!isValid) {
@@ -81,9 +84,9 @@ export async function createModuleController(ctx) {
       {
         mode: "new",
         staff,
-        errors
+        errors,
       },
-      { ...ctx, status: 400 }
+      { ...ctx, status: 400 },
     );
   }
 
@@ -112,9 +115,9 @@ export function editModuleFormController(ctx) {
     {
       mode: "edit",
       module,
-      staff
+      staff,
     },
-    ctx
+    ctx,
   );
 }
 
@@ -132,7 +135,10 @@ export async function updateModuleController(ctx) {
   }
 
   const formData = await ctx.request.formData();
-  const { isValid, errors, validated } = validateSchema(formData, moduleSchema);
+  const { isValid, errors, validated } = validateSchema(
+    formData,
+    moduleSchema,
+  );
   const staff = getAllStaff();
 
   if (!isValid) {
@@ -142,9 +148,9 @@ export async function updateModuleController(ctx) {
         mode: "edit",
         module,
         staff,
-        errors
+        errors,
       },
-      { ...ctx, status: 400 }
+      { ...ctx, status: 400 },
     );
   }
 

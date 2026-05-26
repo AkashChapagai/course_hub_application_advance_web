@@ -1,15 +1,36 @@
 (function () {
-  console.log("app.js file loaded");
+  console.log("app.js file loaded with image support");
 
   function safeText(value) {
     return String(value ?? "");
+  }
+
+  function createProgrammeImage(programme) {
+    if (!programme.imageUrl) {
+      return null;
+    }
+
+    const image = document.createElement("img");
+    image.className = "programme-card-image";
+    image.src = safeText(programme.imageUrl);
+    image.alt = `${safeText(programme.title)} programme image`;
+    image.loading = "lazy";
+
+    return image;
   }
 
   function createProgrammeCard(programme) {
     const card = document.createElement("article");
     card.className = "programme-card";
 
+    const image = createProgrammeImage(programme);
+
+    if (image) {
+      card.append(image);
+    }
+
     const content = document.createElement("div");
+    content.className = "programme-card-content";
 
     const level = document.createElement("span");
     level.className = "programme-level";
@@ -40,15 +61,12 @@
   }
 
   function initProgrammeSearch() {
-    console.log("Initialising programme search");
-
     const searchInput = document.querySelector("#programme-search");
     const levelFilter = document.querySelector("#programme-level-filter");
     const resultsContainer = document.querySelector("#programme-results");
     const resultCount = document.querySelector("#programme-result-count");
 
     if (!searchInput || !levelFilter || !resultsContainer || !resultCount) {
-      console.log("Programme search elements were not found on this page.");
       return;
     }
 
@@ -86,8 +104,6 @@
     }
 
     function filterProgrammes() {
-      console.log("Filtering programmes");
-
       const searchTerm = searchInput.value.trim().toLowerCase();
       const selectedLevel = levelFilter.value;
 
@@ -129,8 +145,6 @@
 
         searchInput.addEventListener("input", filterProgrammes);
         levelFilter.addEventListener("change", filterProgrammes);
-
-        console.log("Search and filter event listeners attached");
       } catch (error) {
         console.error("Programme search failed:", error);
         updateResultCount(0);

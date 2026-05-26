@@ -4,10 +4,27 @@ function safe(value = "") {
   return escape(String(value ?? ""));
 }
 
+function programmeImage(programme) {
+  if (!programme.imageUrl) {
+    return "";
+  }
+
+  return `
+    <img
+      class="programme-card-image"
+      src="${safe(programme.imageUrl)}"
+      alt="${safe(programme.title)} programme image"
+      loading="lazy"
+    >
+  `;
+}
+
 function programmeCard(programme) {
   return `
     <article class="programme-card">
-      <div>
+      ${programmeImage(programme)}
+
+      <div class="programme-card-content">
         <span class="programme-level">${safe(programme.level)}</span>
         <h3>${safe(programme.title)}</h3>
         <p>${safe(programme.description)}</p>
@@ -53,6 +70,7 @@ export function programmesView({ programmes }) {
             type="search"
             placeholder="Try Cyber Security, Computing or Data"
             autocomplete="off"
+            aria-describedby="programme-search-hint"
           >
         </div>
 
@@ -66,7 +84,7 @@ export function programmesView({ programmes }) {
         </div>
       </div>
 
-      <p class="hint">
+      <p id="programme-search-hint" class="hint">
         This list first loads using server-side rendering, then updates with
         JavaScript using fetch, JSON and DOM manipulation.
       </p>
@@ -80,6 +98,7 @@ export function programmesView({ programmes }) {
       id="programme-results"
       class="programme-grid"
       aria-label="Programme results"
+      aria-live="polite"
     >
       ${programmeCards}
     </section>

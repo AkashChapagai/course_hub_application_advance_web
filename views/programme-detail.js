@@ -1,24 +1,66 @@
 import { escape } from "@std/html";
 
+function safe(value = "") {
+  return escape(String(value ?? ""));
+}
+
 function errorMessage(errors, fieldName) {
-  return errors?.[fieldName]?.message
-    ? `<span class="error-message">${escape(errors[fieldName].message)}</span>`
-    : "";
+  const message = errors?.[fieldName]?.message;
+
+  if (!message) {
+    return "";
+  }
+
+  return `<span class="error-message">${safe(message)}</span>`;
 }
 
 function oldValue(errors, fieldName) {
-  return escape(errors?.[fieldName]?.value || "");
+  return safe(errors?.[fieldName]?.value || "");
+}
+
+function programmeImage(programme) {
+  if (!programme.imageUrl) {
+    return "";
+  }
+
+  return `
+    <img
+      class="programme-detail-image"
+      src="${safe(programme.imageUrl)}"
+      alt="${safe(programme.title)} programme image"
+      loading="lazy"
+    >
+  `;
+}
+
+function moduleImage(module) {
+  if (!module.imageUrl) {
+    return "";
+  }
+
+  return `
+    <img
+      class="module-card-image"
+      src="${safe(module.imageUrl)}"
+      alt="${safe(module.title)} module image"
+      loading="lazy"
+    >
+  `;
 }
 
 function moduleItem(module) {
   return `
     <article class="module-card">
-      <h4>${escape(module.title)}</h4>
-      <p>${escape(module.description)}</p>
-      <p class="programme-leader">
-        <strong>Module leader:</strong>
-        ${escape(module.moduleLeader || "To be confirmed")}
-      </p>
+      ${moduleImage(module)}
+
+      <div class="module-card-content">
+        <h4>${safe(module.title)}</h4>
+        <p>${safe(module.description)}</p>
+        <p class="programme-leader">
+          <strong>Module leader:</strong>
+          ${safe(module.moduleLeader || "To be confirmed")}
+        </p>
+      </div>
     </article>
   `;
 }
@@ -35,7 +77,7 @@ function modulesByYearHtml(modulesByYear) {
 
     return `
       <section class="year-section">
-        <h3>Year ${escape(year)}</h3>
+        <h3>Year ${safe(year)}</h3>
         <div class="module-grid">
           ${modules.map(moduleItem).join("")}
         </div>
@@ -47,23 +89,27 @@ function modulesByYearHtml(modulesByYear) {
 export function programmeDetailView({ programme, modulesByYear, errors = {} }) {
   return `
     <section class="programme-detail-header">
-      <p class="programme-level">${escape(programme.level)}</p>
-      <h2>${escape(programme.title)}</h2>
-      <p>${escape(programme.description)}</p>
+      ${programmeImage(programme)}
 
-      <div class="leader-panel">
-        <h3>Programme leader</h3>
-        <p><strong>${escape(programme.programmeLeader || "To be confirmed")}</strong></p>
-        ${
-          programme.programmeLeaderEmail
-            ? `<p><a href="mailto:${escape(programme.programmeLeaderEmail)}">${escape(programme.programmeLeaderEmail)}</a></p>`
-            : ""
-        }
-        ${
-          programme.programmeLeaderBio
-            ? `<p>${escape(programme.programmeLeaderBio)}</p>`
-            : ""
-        }
+      <div class="programme-detail-content">
+        <p class="programme-level">${safe(programme.level)}</p>
+        <h2>${safe(programme.title)}</h2>
+        <p>${safe(programme.description)}</p>
+
+        <div class="leader-panel">
+          <h3>Programme leader</h3>
+          <p><strong>${safe(programme.programmeLeader || "To be confirmed")}</strong></p>
+          ${
+            programme.programmeLeaderEmail
+              ? `<p><a href="mailto:${safe(programme.programmeLeaderEmail)}">${safe(programme.programmeLeaderEmail)}</a></p>`
+              : ""
+          }
+          ${
+            programme.programmeLeaderBio
+              ? `<p>${safe(programme.programmeLeaderBio)}</p>`
+              : ""
+          }
+        </div>
       </div>
     </section>
 
@@ -79,8 +125,8 @@ export function programmeDetailView({ programme, modulesByYear, errors = {} }) {
         open days and application deadlines.
       </p>
 
-      <form method="POST" action="/programmes/${programme.id}/interests" class="form-grid" novalidate>
-        <div>
+      <form method="POST" action="/programmes/${safe(programme.id)}/interests" class="form-grid" novalidate>
+        <div class="form-field">
           <label for="studentName">Full name</label>
           <input
             id="studentName"
@@ -88,13 +134,14 @@ export function programmeDetailView({ programme, modulesByYear, errors = {} }) {
             type="text"
             value="${oldValue(errors, "studentName")}"
             aria-describedby="studentName-error"
+            required
           >
           <span id="studentName-error">
             ${errorMessage(errors, "studentName")}
           </span>
         </div>
 
-        <div>
+        <div class="form-field">
           <label for="studentEmail">Email address</label>
           <input
             id="studentEmail"
@@ -102,6 +149,7 @@ export function programmeDetailView({ programme, modulesByYear, errors = {} }) {
             type="email"
             value="${oldValue(errors, "studentEmail")}"
             aria-describedby="studentEmail-error"
+            required
           >
           <span id="studentEmail-error">
             ${errorMessage(errors, "studentEmail")}

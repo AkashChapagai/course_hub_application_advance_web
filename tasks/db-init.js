@@ -6,11 +6,11 @@ db.exec(`
   DROP TABLE IF EXISTS programme_modules;
   DROP TABLE IF EXISTS interests;
   DROP TABLE IF EXISTS sessions;
+  DROP TABLE IF EXISTS files;
   DROP TABLE IF EXISTS programmes;
   DROP TABLE IF EXISTS modules;
   DROP TABLE IF EXISTS staff;
   DROP TABLE IF EXISTS users;
-  DROP TABLE IF EXISTS files;
 
   PRAGMA foreign_keys = ON;
 
@@ -48,6 +48,7 @@ db.exec(`
     title TEXT NOT NULL,
     level TEXT NOT NULL CHECK(level IN ('Undergraduate', 'Postgraduate')),
     description TEXT NOT NULL,
+    imageUrl TEXT,
     published INTEGER NOT NULL DEFAULT 0,
     programmeLeaderId INTEGER,
     createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -59,6 +60,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     description TEXT NOT NULL,
+    imageUrl TEXT,
     moduleLeaderId INTEGER,
     FOREIGN KEY (moduleLeaderId) REFERENCES staff(id)
   );
@@ -78,6 +80,7 @@ db.exec(`
     studentName TEXT NOT NULL,
     studentEmail TEXT NOT NULL,
     createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(programmeId, studentEmail),
     FOREIGN KEY (programmeId) REFERENCES programmes(id) ON DELETE CASCADE
   );
 `);

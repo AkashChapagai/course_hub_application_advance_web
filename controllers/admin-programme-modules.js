@@ -9,14 +9,14 @@ import {
   getProgrammeForAdminById,
   getProgrammeModulesForAdmin,
   attachModuleToProgramme,
-  removeModuleFromProgramme
+  removeModuleFromProgramme,
 } from "../models/programme.js";
 
 import { getAllModulesForAdmin } from "../models/module.js";
 
 import {
   validateSchema,
-  programmeModuleSchema
+  programmeModuleSchema,
 } from "../tools/validation.js";
 
 function loadProgrammeModulePageData(programmeId) {
@@ -29,7 +29,7 @@ function loadProgrammeModulePageData(programmeId) {
   return {
     programme,
     currentModules: getProgrammeModulesForAdmin(programmeId),
-    allModules: getAllModulesForAdmin()
+    allModules: getAllModulesForAdmin(),
   };
 }
 
@@ -49,7 +49,7 @@ export function programmeModulesController(ctx) {
   return render(
     adminProgrammeModulesView,
     pageData,
-    ctx
+    ctx,
   );
 }
 
@@ -68,23 +68,26 @@ export async function attachProgrammeModuleController(ctx) {
   }
 
   const formData = await ctx.request.formData();
-  const { isValid, errors, validated } = validateSchema(formData, programmeModuleSchema);
+  const { isValid, errors, validated } = validateSchema(
+    formData,
+    programmeModuleSchema,
+  );
 
   if (!isValid) {
     return render(
       adminProgrammeModulesView,
       {
         ...pageData,
-        errors
+        errors,
       },
-      { ...ctx, status: 400 }
+      { ...ctx, status: 400 },
     );
   }
 
   attachModuleToProgramme({
     programmeId,
     moduleId: validated.moduleId,
-    year: validated.year
+    year: validated.year,
   });
 
   return redirect(`/admin/programmes/${programmeId}/modules`);
@@ -101,7 +104,7 @@ export function removeProgrammeModuleController(ctx) {
 
   removeModuleFromProgramme({
     programmeId,
-    moduleId
+    moduleId,
   });
 
   return redirect(`/admin/programmes/${programmeId}/modules`);

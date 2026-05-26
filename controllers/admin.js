@@ -5,7 +5,6 @@ import { requireAdmin } from "../tools/authorisation.js";
 import { adminDashboardView } from "../views/admin-dashboard.js";
 import { adminProgrammesView } from "../views/admin-programmes.js";
 import { adminProgrammeFormView } from "../views/admin-programme-form.js";
-
 import { notFoundView } from "../views/not-found.js";
 
 import {
@@ -15,14 +14,14 @@ import {
   updateProgramme,
   deleteProgramme,
   publishProgramme,
-  unpublishProgramme
+  unpublishProgramme,
 } from "../models/programme.js";
 
 import { getAllStaff } from "../models/staff.js";
 
 import {
   validateSchema,
-  programmeSchema
+  programmeSchema,
 } from "../tools/validation.js";
 
 function formDataToProgramme(validated) {
@@ -30,8 +29,9 @@ function formDataToProgramme(validated) {
     title: validated.title,
     level: validated.level,
     description: validated.description,
+    imageUrl: validated.imageUrl || null,
     programmeLeaderId: validated.programmeLeaderId || null,
-    published: validated.published === "1"
+    published: validated.published === "1",
   };
 }
 
@@ -45,7 +45,7 @@ export function adminDashboardController(ctx) {
   return render(
     adminDashboardView,
     { session: ctx.session },
-    ctx
+    ctx,
   );
 }
 
@@ -61,7 +61,7 @@ export function adminProgrammesController(ctx) {
   return render(
     adminProgrammesView,
     { programmes },
-    ctx
+    ctx,
   );
 }
 
@@ -78,9 +78,9 @@ export function newProgrammeFormController(ctx) {
     adminProgrammeFormView,
     {
       mode: "new",
-      staff
+      staff,
     },
-    ctx
+    ctx,
   );
 }
 
@@ -92,7 +92,10 @@ export async function createProgrammeController(ctx) {
   }
 
   const formData = await ctx.request.formData();
-  const { isValid, errors, validated } = validateSchema(formData, programmeSchema);
+  const { isValid, errors, validated } = validateSchema(
+    formData,
+    programmeSchema,
+  );
   const staff = getAllStaff();
 
   if (!isValid) {
@@ -101,9 +104,9 @@ export async function createProgrammeController(ctx) {
       {
         mode: "new",
         staff,
-        errors
+        errors,
       },
-      { ...ctx, status: 400 }
+      { ...ctx, status: 400 },
     );
   }
 
@@ -132,9 +135,9 @@ export function editProgrammeFormController(ctx) {
     {
       mode: "edit",
       programme,
-      staff
+      staff,
     },
-    ctx
+    ctx,
   );
 }
 
@@ -152,7 +155,10 @@ export async function updateProgrammeController(ctx) {
   }
 
   const formData = await ctx.request.formData();
-  const { isValid, errors, validated } = validateSchema(formData, programmeSchema);
+  const { isValid, errors, validated } = validateSchema(
+    formData,
+    programmeSchema,
+  );
   const staff = getAllStaff();
 
   if (!isValid) {
@@ -162,9 +168,9 @@ export async function updateProgrammeController(ctx) {
         mode: "edit",
         programme,
         staff,
-        errors
+        errors,
       },
-      { ...ctx, status: 400 }
+      { ...ctx, status: 400 },
     );
   }
 

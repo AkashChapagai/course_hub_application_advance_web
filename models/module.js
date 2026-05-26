@@ -6,6 +6,7 @@ export function getAllModulesForAdmin() {
       modules.id,
       modules.title,
       modules.description,
+      modules.imageUrl,
       modules.moduleLeaderId,
       staff.name AS moduleLeader,
       staff.email AS moduleLeaderEmail
@@ -21,6 +22,7 @@ export function getModuleForAdminById(id) {
       id,
       title,
       description,
+      imageUrl,
       moduleLeaderId
     FROM modules
     WHERE id = ?
@@ -30,40 +32,46 @@ export function getModuleForAdminById(id) {
 export function createModule({
   title,
   description,
-  moduleLeaderId
+  imageUrl,
+  moduleLeaderId,
 }) {
   return db.prepare(`
     INSERT INTO modules (
       title,
       description,
+      imageUrl,
       moduleLeaderId
     )
-    VALUES (?, ?, ?)
+    VALUES (?, ?, ?, ?)
     RETURNING id
   `).get(
     title,
     description,
-    moduleLeaderId || null
+    imageUrl || null,
+    moduleLeaderId || null,
   );
 }
 
 export function updateModule(id, {
   title,
   description,
-  moduleLeaderId
+  imageUrl,
+  moduleLeaderId,
 }) {
   db.prepare(`
     UPDATE modules
     SET
       title = ?,
       description = ?,
+      imageUrl = ?,
       moduleLeaderId = ?
     WHERE id = ?
   `).run(
     title,
     description,
+    imageUrl || null,
     moduleLeaderId || null,
-    id
+    id,
   );
 }
 
