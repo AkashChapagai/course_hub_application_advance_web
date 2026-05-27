@@ -84,11 +84,6 @@ export function programmesView({ programmes }) {
         </div>
       </div>
 
-      <p id="programme-search-hint" class="hint">
-        This list first loads using server-side rendering, then updates with
-        JavaScript using fetch, JSON and DOM manipulation.
-      </p>
-
       <p id="programme-result-count" class="hint" aria-live="polite">
         Showing ${programmes.length} programme${programmes.length === 1 ? "" : "s"}.
       </p>
